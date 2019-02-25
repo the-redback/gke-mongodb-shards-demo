@@ -26,18 +26,6 @@ spec:
         tier: maindb
         replicaset: ShardXRepSet
     spec:
-      affinity:
-        podAntiAffinity:
-          preferredDuringSchedulingIgnoredDuringExecution:
-          - weight: 100
-            podAffinityTerm:
-              labelSelector:
-                matchExpressions:
-                - key: replicaset
-                  operator: In
-                  values:
-                  - ShardXRepSet
-              topologyKey: kubernetes.io/hostname
       terminationGracePeriodSeconds: 10
       volumes:
         - name: secrets-volume
@@ -46,13 +34,15 @@ spec:
             defaultMode: 256
       containers:
         - name: mongod-shardX-container
-          image: mongo
+          image: mongo:3.6
           command:
             - "numactl"
             - "--interleave=all"
             - "mongod"
             - "--port"
             - "27017"
+            - "--dbpath"
+            - "/data/db"
             - "--wiredTigerCacheSizeGB"
             - "0.25"
             - "--bind_ip"
@@ -67,10 +57,6 @@ spec:
             - "/etc/secrets-volume/internal-auth-mongodb-keyfile"
             - "--setParameter"
             - "authenticationMechanisms=SCRAM-SHA-1"
-          resources:
-            requests:
-              cpu: 0.25
-              memory: 512Mi
           ports:
             - containerPort: 27017
           volumeMounts:
@@ -83,9 +69,9 @@ spec:
   - metadata:
       name: mongo-shardX-persistent-storage-claim
       annotations:
-        volume.beta.kubernetes.io/storage-class: "fast"
+        volume.beta.kubernetes.io/storage-class: "standard"
     spec:
       accessModes: [ "ReadWriteOnce" ]
       resources:
         requests:
-          storage: 8Gi
+          storage: 1Gi

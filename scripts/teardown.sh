@@ -15,7 +15,7 @@ kubectl delete services mongodb-shard3-service
 kubectl delete statefulsets mongod-configdb
 kubectl delete services mongodb-configdb-service
 kubectl delete secret shared-bootstrap-data
-kubectl delete daemonset hostvm-configurer
+# kubectl delete daemonset hostvm-configurer
 sleep 3
 
 # Delete persistent volume claims
@@ -34,16 +34,16 @@ do
 done
 sleep 20
 
-# Delete GCE disks
-for i in 1 2 3
-do
-    gcloud -q compute disks delete pd-ssd-disk-4g-$i
-done
-for i in 1 2 3 4 5 6 7 8 9
-do
-    gcloud -q compute disks delete pd-ssd-disk-8g-$i
-done
+# # Delete GCE disks
+# for i in 1 2 3
+# do
+#     gcloud -q compute disks delete pd-ssd-disk-4g-$i
+# done
+# for i in 1 2 3 4 5 6 7 8 9
+# do
+#     gcloud -q compute disks delete pd-ssd-disk-8g-$i
+# done
 
-# Delete whole Kubernetes cluster (including its VM instances)
-gcloud -q container clusters delete "gke-mongodb-demo-cluster"
+# # Delete whole Kubernetes cluster (including its VM instances)
+# gcloud -q container clusters delete "gke-mongodb-demo-cluster"
 
