@@ -1,4 +1,7 @@
-#!/bin/sh
+#!/bin/bash
+
+set -xeou pipefail
+
 ##
 # Script to deploy a Kubernetes project with a StatefulSet running a MongoDB Sharded Cluster, to GKE.
 ##
