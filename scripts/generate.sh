@@ -150,14 +150,18 @@ echo
 
 # Add Shards to the Configdb
 echo "Configuring ConfigDB to be aware of the 3 Shards"
-kubectl exec mongos-router-0 -c mongos-container -- mongo --eval 'sh.addShard("Shard1RepSet/mongod-shard1-0.mongodb-shard1-service.default.svc.cluster.local:27017");'
-kubectl exec mongos-router-0 -c mongos-container -- mongo --eval 'sh.addShard("Shard2RepSet/mongod-shard2-0.mongodb-shard2-service.default.svc.cluster.local:27017");'
-kubectl exec mongos-router-0 -c mongos-container -- mongo --eval 'sh.addShard("Shard3RepSet/mongod-shard3-0.mongodb-shard3-service.default.svc.cluster.local:27017");'
+kubectl exec mongos-router-0 -c mongos-container -- mongo --eval 'sh.addShard("Shard1RepSet/mongod-shard1-2.mongodb-shard1-service.default.svc.cluster.local:27017");'
+kubectl exec mongos-router-0 -c mongos-container -- mongo --eval 'sh.addShard("Shard2RepSet/mongod-shard2-2.mongodb-shard2-service.default.svc.cluster.local:27017");'
+kubectl exec mongos-router-0 -c mongos-container -- mongo --eval 'sh.addShard("Shard3RepSet/mongod-shard3-2.mongodb-shard3-service.default.svc.cluster.local:27017");'
 sleep 3
 
 
 # Create the Admin User (this will automatically disable the localhost exception)
-echo "Creating user: 'main_admin'"
+echo "Creating replicaset user: 'main_admin'"
+kubectl exec mongod-shard1-0 -c mongod-shard1-container -- mongo --eval 'db.getSiblingDB("admin").createUser({user:"root",pwd:"'"${NEW_PASSWORD}"'",roles:[{role:"root",db:"admin"}]});'
+kubectl exec mongod-shard2-0 -c mongod-shard2-container -- mongo --eval 'db.getSiblingDB("admin").createUser({user:"root",pwd:"'"${NEW_PASSWORD}"'",roles:[{role:"root",db:"admin"}]});'
+kubectl exec mongod-shard3-0 -c mongod-shard3-container -- mongo --eval 'db.getSiblingDB("admin").createUser({user:"root",pwd:"'"${NEW_PASSWORD}"'",roles:[{role:"root",db:"admin"}]});'
+echo
 kubectl exec mongos-router-0 -c mongos-container -- mongo --eval 'db.getSiblingDB("admin").createUser({user:"main_admin",pwd:"'"${NEW_PASSWORD}"'",roles:[{role:"root",db:"admin"}]});'
 echo
 
